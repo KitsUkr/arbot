@@ -5,7 +5,7 @@ from decimal import Decimal
 from enum import StrEnum
 from typing import Self
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class Venue(StrEnum):
@@ -55,6 +55,10 @@ class MarketQuote(BaseModel):
     no: Quote
     fetched_at: datetime
     url: str | None = None
+    # IDs of equivalent markets on OTHER venues, when the venue itself
+    # advertises a cross-listing (e.g. predict.fun's `polymarketConditionIds`).
+    # Used by the matcher for direct ID-based pairing — bypasses fuzzy matching.
+    linked_market_ids: tuple[str, ...] = Field(default_factory=tuple)
 
     @model_validator(mode="after")
     def _check(self) -> Self:
@@ -74,8 +78,9 @@ class MarketPair(BaseModel):
 
     a: MarketQuote
     b: MarketQuote
-    similarity: int
+    similarity: int  # 100 for direct ID match, fuzzy score (0..100) otherwise
     expiry_delta_hours: float | None
+    match_method: str = "fuzzy"  # "direct" | "fuzzy"
 
     @model_validator(mode="after")
     def _check(self) -> Self:
@@ -106,7 +111,6 @@ class Opportunity(BaseModel):
 
     @property
     def fingerprint(self) -> str:
-        """Stable id for dedup. Coarse on price so micro-jitter doesn't replay alerts."""
         a_id = self.pair.a.venue_market_id
         b_id = self.pair.b.venue_market_id
         cost_bucket = f"{self.net_cost:.2f}"
