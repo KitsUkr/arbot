@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     polymarket_gamma_url: str = "https://gamma-api.polymarket.com"
     polymarket_clob_url: str = "https://clob.polymarket.com"
     predictfun_api_url: str = "https://api.predict.fun"
+    predictfun_api_key: str = ""  # required for mainnet; testnet works without
+    predictfun_max_markets: int = 60  # rate limit ~240/min, each market = 1 orderbook call
+    predictfun_concurrency: int = 4
 
     dedup_ttl_seconds: int = 600
 
