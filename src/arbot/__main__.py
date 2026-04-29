@@ -26,7 +26,12 @@ async def amain() -> None:
         gamma_url=settings.polymarket_gamma_url,
         clob_url=settings.polymarket_clob_url,
     )
-    predictfun = PredictFunClient(api_url=settings.predictfun_api_url)
+    predictfun = PredictFunClient(
+        api_url=settings.predictfun_api_url,
+        api_key=settings.predictfun_api_key,
+        max_markets=settings.predictfun_max_markets,
+        concurrency=settings.predictfun_concurrency,
+    )
     matcher = MarketMatcher(
         title_similarity_threshold=settings.title_similarity_threshold,
         max_expiry_delta_hours=settings.max_expiry_delta_hours,
