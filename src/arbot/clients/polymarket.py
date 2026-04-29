@@ -17,7 +17,12 @@ _BOOKS_BATCH = 25
 
 
 class PolymarketClient:
-    """Polymarket data client: list active markets via Gamma, fetch L2 books via CLOB."""
+    """Polymarket data client: list active markets via Gamma, fetch L2 books via CLOB.
+
+    The market's `conditionId` is exported in `linked_market_ids` so the cross-venue
+    matcher can do direct ID-based matching against predict.fun's
+    `polymarketConditionIds` cross-listing field.
+    """
 
     venue_name = "polymarket"
 
@@ -78,6 +83,10 @@ class PolymarketClient:
             except ValueError as e:
                 log.debug("polymarket.skip_book", id=mid, reason=str(e))
                 continue
+
+            condition_id = str(m.get("conditionId") or m.get("condition_id") or "").strip()
+            linked = (condition_id,) if condition_id else ()
+
             try:
                 quote = MarketQuote(
                     venue=Venue.POLYMARKET,
@@ -88,6 +97,7 @@ class PolymarketClient:
                     no=no_q,
                     fetched_at=now,
                     url=f"https://polymarket.com/event/{m.get('slug', '')}",
+                    linked_market_ids=linked,
                 )
             except Exception as e:
                 log.debug("polymarket.skip_validate", id=mid, error=str(e))
