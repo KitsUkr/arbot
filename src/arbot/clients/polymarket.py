@@ -30,7 +30,7 @@ class PolymarketClient:
         self,
         gamma_url: str,
         clob_url: str,
-        max_markets: int = 2000,
+        max_markets: int = 800,
         timeout_seconds: float = 15.0,
     ) -> None:
         self._gamma_url = gamma_url.rstrip("/")
