@@ -91,7 +91,7 @@ class PredictFunClient:
         while len(all_markets) < self._max_markets and page < max_pages:
             params: dict[str, Any] = {
                 "first": min(50, self._max_markets - len(all_markets)),
-                "status": "REGISTERED",
+                "status": "OPEN",
             }
             if cursor:
                 params["after"] = cursor
