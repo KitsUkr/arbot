@@ -12,7 +12,7 @@ from ..models import MarketQuote, OutcomeSide, Quote, Venue
 
 log = structlog.get_logger(__name__)
 
-_GAMMA_PAGE_LIMIT = 100
+_GAMMA_PAGE_LIMIT = 500
 _BOOKS_BATCH = 25
 
 
@@ -30,7 +30,7 @@ class PolymarketClient:
         self,
         gamma_url: str,
         clob_url: str,
-        max_markets: int = 200,
+        max_markets: int = 2000,
         timeout_seconds: float = 15.0,
     ) -> None:
         self._gamma_url = gamma_url.rstrip("/")
@@ -117,6 +117,8 @@ class PolymarketClient:
                 "archived": "false",
                 "limit": _GAMMA_PAGE_LIMIT,
                 "offset": offset,
+                "order": "volume24hr",
+                "ascending": "false",
             }
             try:
                 r = await self._http.get(f"{self._gamma_url}/markets", params=params)
